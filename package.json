@@ -1,0 +1,34 @@
+{
+	"name": "thegreenshot",
+	"version": "1.0.0",
+	"description": "",
+	"main": "./src/server/index.js",
+	"scripts": {
+		"test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --forceExit",
+		"dev": "nodemon ./src/server"
+	},
+	"type": "module",
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"dotenv": "^16.4.5",
+		"koa": "^2.15.3",
+		"koa-bodyparser": "^4.4.1",
+		"koa-router": "^13.0.1"
+	},
+	"devDependencies": {
+		"jest": "^29.7.0",
+		"nodemon": "^3.1.4",
+		"supertest": "^7.0.0"
+	},
+	"jest": {
+		"transform": {}
+	},
+	"imports": {
+		"#modules/*": "./src/modules/*",
+		"#server/*": "./src/server/*",
+		"#utils/*": "./src/utils/*",
+		"#src/*": "./src/*"
+	}
+}
