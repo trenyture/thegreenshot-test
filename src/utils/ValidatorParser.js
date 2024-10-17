@@ -7,7 +7,11 @@ import { formatDate } from "./Helpers.js"
 
 const regexs = {
 	email : /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-	uuid : /^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/
+	uuid : /^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/,
+	/* Dans le cas des URL on va être laxiste et permettre du "localhost" si on est pas en production */
+	url: process.env.ENVIRONMENT !== "production"
+		? /^(https?:\/\/)?(localhost|[a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$/ 
+		: /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/,
 }
 
 const ValidatorParser = {
@@ -24,7 +28,6 @@ const ValidatorParser = {
 			if (options.canBeNull) return null
 			throw error
 		}
-		// Ceci permet d'utiliser la fonction pour la validation de textes spéciaux (cf : email)
 		if (options.regex && !options.regex.test(value)) {
 			error.message = options.regexErrorMessage || "Le texte est invalide"
 			throw error
@@ -98,7 +101,7 @@ const ValidatorParser = {
 		const num = Math.round(Number.parseFloat(value) * precision) / precision
 
 		if (isNaN(num)) {
-			if (options.nullable) return null
+			if (options.canBeNull) return null
 			error.message = "Le nombre décimal est obligatoire"
 			throw error
 		}
@@ -114,17 +117,18 @@ const ValidatorParser = {
 		return num
 	},
 
-	// Dans ce projet ce n'est pas nécessaire mais c'est pour vous montrer ce que je disais plus tôt avec les regex
 	email : function(value, options = {}) {
-		// on met en lowercase la valeur car les emails ne contiennent pas de majuscules
 		if (typeof value === "string") value = value.toLowerCase().trim()
 		return this.text(value, { ...options, regex: regexs.email, regexErrorMessage: "L'email est invalide" })
 	},
 
-	// Pareil avec un UUID par exemple
 	uuid : function(value, options = {}) {
 		return this.text(value, { ...options, regex: regexs.uuid, regexErrorMessage: "L'UUID est invalide" })
-	}
+	},
+
+	url : function(value, options = {}) {
+		return this.text(value, { ...options, regex: regexs.url, regexErrorMessage: "L'url est invalide" })
+	},
 }
 
 export default ValidatorParser;
